@@ -1,0 +1,809 @@
+# !/usr/bin/env python3
+import json
+
+from bs4 import BeautifulSoup
+import requests
+import os
+import re
+from re import search
+
+path = '/tmp/pyprogram/test2'
+file = 'myfile.txt'
+extracted_records = []
+
+# need to make a case when the class ="more" so that can be included in the download
+# def get_federal_links():
+for page in range(1, 2):
+    # Step 1: Sending a HTTP request to a URL
+    url = "https://catalog.data.gov/dataset?organization_type=Federal+Government&page="
+    # Make a GET request to fetch the raw HTML content
+    html_content = requests.get(url + str(page)).text
+
+    # Step 2: Parse the html content
+    soup = BeautifulSoup(html_content, 'html5lib')
+
+    html_string = 'data-format="html"'
+    xml_string = 'data-format="xml"'
+    csv_string = 'data-format="csv"'
+    json_string = 'data-format="json"'
+    excel_string = 'data-format="excel"'
+    pdf_string = 'data-format="pdf"'
+    kml_string = 'data-format="kml"'
+    esri_rest_string = 'data-format="esri rest"'
+    esri_grid_string = 'data-format="esri grid"'
+    zip_string = 'data-format="zip"'
+    zip_file_string = 'data-format="zipped file"'
+    zipcsv_string = 'data-format="zipped csv"'
+    ziptxt_string = 'data-format="zipped txt"'
+    zipspss_string = 'data-format="zipped spss"'
+    zipsas_string = 'data-format="zipped sas"'
+    zipsas7bdat_string = 'data-format="zipped sas7bdat"'
+    zipsav_string = 'data-format="zipped sav"'
+    csvtxtzip_string = 'data-format="csv/txt"'
+    zipascii_string = 'data-format="zipped ascii"'
+    zipdat_string = 'data-format="zipped dat"'
+    ziptsv_string = 'data-format="zipped tsv"'
+    netcdf_4_string = 'data-format="netcdf-4"'
+    netcdf_string = 'data-format="netcdf"'
+    netcdf3_classic_string = 'data-format="netcdf3_classic"'
+    originator_data_string = 'data-format="originator data format"'
+    raw_instrument_string = 'data-format="raw instrument files"'
+    data_explorer_string = 'data-format="data explorer"'
+    cdf_string = 'data-format="cdf"'
+    wms_string = 'data-format="wms"'
+    wcs_string = 'data-format="wcs"'
+    ords_endpoint_string = 'data-format="ords endpoint"'
+    access_string = 'data-format="access"'
+    peg_string = 'data-format="jpeg"'
+    tsv_string = 'data-format="tsv"'
+    bin_string = 'data-format="bin"'
+    ascii_string = 'data-format="ascii"'
+    gis_shape_file_string = 'data-format="gis shape file"'
+    open_xml_string = 'data-format="openxml"'
+    text_string = 'data-format="text"'
+    api_string = 'data-format="api"'
+    uswx_string = 'data-format="uswx"'
+    jpeg_string = 'data-format="jpeg"'
+    png_string = 'data-format="png"'
+    rss_string = 'data-format="rss"'
+    api_json_string = 'data-format="application/vnd.api+json"'
+    ms_word_doc_string = 'data-format="microsoft word document"'
+    doc_string = 'data-format="doc"'
+    binary_string = 'data-format="binary"'
+    arcims_string = 'data-format="arcims"'
+    shp_string = 'data-format="shp"'
+    tiff_string = 'data-format="tiff"'
+    opendap_string = 'data-format="opendap"'
+    hdf_string = 'data-format="hdf"'
+    rdf_string = 'data-format="rdf"'
+    iwxmm_us_string = 'data-format="iwxmm-us"'
+    java_string = 'data-format="java"'
+    comma_sep_val_string = 'data-format="csv (comma-separated values)"'
+    ascii_text_string = 'data-format="ascii text (.txt)"'
+    sid_string = 'data-format="sid"'
+    xyz_string = 'data-format="xyz"'
+    api_html_string = 'data-format="application/html"'
+    html_pdf_doc_string = 'data-format="html, pdf, doc"'
+    zippdf_string = 'data-format="zipped pdf"'
+    exe_string = 'data-format="exe"'
+    sos_string = 'data-format="sos"'
+    wfs_string = 'data-format="sos"'
+    arce_string = 'data-format ="arce"'
+    esri_lpk_string = 'data-format ="esri layer package (lpk)"'
+    gml_string = 'data-format="gml"'
+    map_interchange_string = 'data-format="mapinfo interchange file (mif)"'
+    FEMA_DCS_Hydrology_string = 'data-format="fema-dcs-hydrology"'
+    FEMA_DCS_Hydraulics_string = 'data-format="fema-dcs-hydraulics"'
+    FEMA_DCS_Terrain_string = 'data-format="fema-dcs-terrain"'
+    geotiff_string = 'data-format="geotiff"'
+    api_unknown_string = 'data-format="application/unknown"'
+    xsl_string = 'data-format="xsl"'
+    tar_string = 'data-format="tar"'
+    qgis_string = 'data-format="qgis"'
+    nmea_string = 'data-format="nmea"'
+    FEMA_DCS_Survey_string = 'data-format="fema-dcs-survey"'
+    export_string = 'data-format="export"'
+    vector_digital_data_string = 'data-format="vector digital data set (polygon)"'
+    raster_digital_data_string = 'data-format="raster digital data"'
+    digital_data_string = 'data-format="digital data"'
+
+    data_containers = soup.find_all('a', class_='label')
+    for links in data_containers:
+        if search(html_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            print('HTML:')
+            data_format = 'HTML'
+            # assert isinstance(name_of_org, object)
+            print(name_of_org)
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # XML STRINGS
+        elif search(xml_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            print('XML:')
+            data_format = 'XML'
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # openXML files for immediate download
+        elif search(open_xml_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'OpenXML'
+            print('OpenXML:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # rss extension is xml for immediate download
+        elif search(rss_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'RSS'
+            print('RSS:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # Export for immediate download
+        elif search(export_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Export'
+            print('Export:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # CSV FILES
+        elif search(csv_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'CSV'
+            print('CSV:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # JSON STRINGS
+        elif search(json_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'JSON'
+            print('JSON:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # application/vnd.api+json for immediate download
+        elif search(api_json_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'application/vnd.api+json'
+            print('application/vnd.api+json:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # application/html produces website for optional download
+        elif search(api_html_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Application/HTML'
+            print('Application/HTML:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # application/unknown produces website for optional download
+        elif search(api_unknown_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Application/Unknown:'
+            print('Application/Unknown:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # text produces new link of text with .txt extension
+        elif search(text_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Text'
+            print('Text:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # EXCEL STRINGS
+        elif search(excel_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'EXCEL'
+            print('EXCEL:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # PDF FILES
+        elif search(pdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'PDF'
+            print('PDF:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # bin downloads as a pdf
+        elif search(bin_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'BIN'
+            print('BIN:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # zip will be immediately downloaded
+        elif search(zip_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP'
+            print('ZIP:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # zip files will be immediately downloaded
+        elif search(zip_file_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP File'
+            print('ZIP File:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # zip text will be immediately downloaded
+        elif search(ziptxt_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP Txt'
+            print('ZIP Txt:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zip text will be immediately downloaded
+        elif search(zipcsv_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP CSV'
+            print('ZIP Csv:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zipped pdf will be immediately downloaded
+        elif search(zippdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP PDF'
+            print('ZIP PDF:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # zipped spss will be immeditaely downloaded
+        elif search(zipspss_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP SPSS'
+            print('ZIP SPSS:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zipped sas will be immediately downloaded
+        elif search(zipsas_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP SAS'
+            print('ZIP SAS:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zipsas7bdat_string for immediate download
+        elif search(zipsas7bdat_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP SAS7BDAT'
+            print('ZIP SAS7BDAT:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # zipped sav for immediate download
+        elif search(zipsav_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP SAV'
+            print('ZIP SAV:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # csv/txt for immediate download
+        elif search(csvtxtzip_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'CSV/TXT'
+            print('CSV/TXT:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zipascii for immediate download
+        elif search(zipascii_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP ASCII'
+            print('ZIP ASCII:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # zipdat_string for immediate download
+        elif search(zipdat_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP DAT'
+            print('ZIP DAT:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # ziptsv_string for immediate download
+        elif search(ziptsv_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ZIP TSV'
+            print('ZIP TSV:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # RDF for immediate download
+        elif search(rdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'RDF'
+            print('RDF:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # sid for immediate download
+        elif search(sid_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'SID'
+            print('SID:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # xyz for immediate download'
+        elif search(xyz_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'XYZ'
+            print('XYZ:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # TAR for immediate download'
+        elif search(tar_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'TAR'
+            print('TAR:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # NetCDF3_Classic
+        elif search(netcdf3_classic_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'NETCDF3_CLASSIC'
+            print('NETCDF3_CLASSIC:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # TSV to download data to txt file
+        elif search(tsv_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'TSV'
+            print('TSV:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # jpeg routes to html
+        elif search(jpeg_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'JPEG'
+            print('JPEG:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # gml routes to html
+        elif search(gml_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'GML'
+            print('GML:')
+            print(link_i_want)
+            #return name_of_org and link_i_want
+        # png delivers html link with a png
+        elif search(png_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'PNG'
+            print('PNG:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # exe routes to html
+        elif search(exe_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'JPEG'
+            print('JPEG:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # java routes to html for optional download
+        elif search(java_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Java'
+            print('Java:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # QGIS routes to html for optional download
+        elif search(qgis_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'QGIS'
+            print('QGIS:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # nmea routes to html for optional download
+        elif search(nmea_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'NMEA'
+            print('NMEA:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # vector digital data set to html for optional download
+        elif search(vector_digital_data_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Vector Digital Data Set'
+            print('Vector Digital Data Set:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # Raster Digital Data to html for optional download
+        elif search(raster_digital_data_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Raster Digital Data Set'
+            print('Raster Digital Data Set:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # csv (comma-separated values) routes to html for optional download
+        elif search(comma_sep_val_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'CSV (comma-separated values)'
+            print('CSV (comma-separated values):')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # KML files that need to be pulled by HTML then downloaded from that website
+        # need separate program to pull documents from each link
+        elif search(kml_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'KML'
+            print('KML:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # netcdf-4
+        elif search(netcdf_4_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'netcdf-4'
+            print('netcdf-4:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # netcdf for immediate download
+        elif search(netcdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'netcdf'
+            print('netcdf:')
+            print(link_i_want)
+            # return name_of_org and link_i_want
+        # word document for immediate download
+        elif search(ms_word_doc_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Microsoft Word Document'
+            print('Microsoft Word Document:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # doc  document for immediate download
+        elif search(doc_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'DOC'
+            print('DOC:')
+            print(link_i_want)
+            #      return name_of_org and link_i_want
+        # doc  document for immediate download
+        elif search(esri_lpk_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ESRI Layer Package(LPK)'
+            print('ESRI Layer Package(LPK):')
+            print(link_i_want)
+            #       return name_of_org and link_i_want
+        # website nothing to download for data explorer
+        elif search(data_explorer_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Data Explorer'
+            print('Data Explorer:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # originator dataformat, just HTML no download
+        elif search(originator_data_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Originator Data format'
+            print('Originator Data format:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # GIS Shape File, just HTML no download, need to check
+        elif search(gis_shape_file_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'GIS Shape File'
+            print('GIS Shape File:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # API, just HTML no download
+        elif search(api_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'API'
+            print('API:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # esri rest (HTML link nothing to download)
+        elif search(esri_rest_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ESRI REST'
+            print('ESRI REST:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # esri rest (HTML link nothing to download)
+        elif search(wfs_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'WFS'
+            print('WFS:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # esri grid HTML link
+        elif search(esri_grid_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ESRI Grid'
+            print('ESRI Grid:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # Binary no download just HTML link
+        elif search(binary_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Binary'
+            print('Binary:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # Binary no download just HTML link
+        elif search(arce_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ARCE'
+            print('ARCE:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # ords_endpoint gives json data, can save to txt file
+        elif search(ords_endpoint_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ORDS Endpoint'
+            print('ORDS Endpoint:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # xsl gives random data at a html, try and save to txt file
+        elif search(xsl_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'XSL'
+            print('XSL:')
+            print(link_i_want)
+            #  return name_of_org and link_i_want
+        # access gives a link with option to download data via ftp
+        elif search(access_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ACCESS'
+            print('Access:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # iwxmm-us gives a link with option to download data via ftp
+        elif search(iwxmm_us_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'IWXMM-US'
+            print('IWXMM-US:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # ascii text(.txt) fwd to ftp for download
+        elif search(ascii_text_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ASCII Text .txt'
+            print('ASCII Text .txt:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # GeoTIFF gives html with links for download on website
+        elif search(geotiff_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'GeoTIFF'
+            print('GeoTIFF:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # tiff gives html with links for download on website
+        elif search(tiff_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'TIFF'
+            print('TIFF:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # digital data gives html with links for download on website
+        elif search(digital_data_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Digital Data'
+            print('Digital Data:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # raw instrutment file are just html, no downlooads
+        elif search(raw_instrument_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Raw Instrutment file'
+            print('Raw Instrutment file:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # ascii html no downloads
+        elif search(ascii_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Ascii'
+            print('Ascii:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # ArcIMS html no downloads
+        elif search(arcims_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'ARCIMS'
+            print('ARCIMS:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # SHP html no downloads
+        elif search(shp_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'SHP'
+            print('SHP:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # cdf_string just html no downloads
+        elif search(cdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'CDF'
+            print('CDF:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # map_interchange_string just html no downloads
+        elif search(map_interchange_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Map Interchange File(MIF):'
+            print('Map Interchange File(MIF):')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # FEMA DCS Hydrology just html no downloads
+        elif search(FEMA_DCS_Hydrology_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'FEMA DCS Hydrology'
+            print('FEMA DCS Hydrology:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # FEMA_DCS_Hydraulics_string just html no downloads
+        elif search(FEMA_DCS_Hydraulics_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'FEMA DCS Hydraulics'
+            print('FEMA DCS Hydraulics:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # FEMA_DCS_Terrain just html no downloads
+        elif search(FEMA_DCS_Terrain_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'FEMA DCS Terrain'
+            print('FEMA DCS Terrain:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # FEMA_DCS Sruvey just html no downloads
+        elif search(FEMA_DCS_Survey_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'FEMA DCS Survey'
+            print('FEMA DCS Survey:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # WMS forwarded to new website for download
+        elif search(wms_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'WMS'
+            print('WMS:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # WCS forwarded to new website for download
+        elif search(wcs_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'WCS'
+            print('WCS:')
+            print(link_i_want)
+            #    return name_of_org and link_i_want
+        # opendap forwards to new link with various articles
+        elif search(opendap_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'OPeNDAP'
+            print('OPeNDAP:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # USWX forwards to FTP for download
+        elif search(uswx_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'USWX'
+            print('USWX:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # hdf forwards to html
+        elif search(hdf_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'HDF'
+            print('HDF:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # hdf forwards to html
+        elif search(sos_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'SOS'
+            print('SOS:')
+            print(link_i_want)
+            #   return name_of_org and link_i_want
+        # html, pdf, doc forwards to html
+        elif search(html_pdf_doc_string, str(links)):
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'html, pdf, doc'
+            print('html, pdf, doc:')
+            print(link_i_want)
+
+        # xml, csv/txt, xls, shapefile, kml/kmz, pdf
+        # great lakes bathymetric contours shapefile format
+        # via ftp: sao, edp gif, png, mmm, 16c, rsf, sdf, grm, dft and sky via spidr: ascii, xml matlab
+        # ocg wms service for great lakes bathymetric contours
+        # tabular digital data(fixed width, tab delimited, or csv)
+        # kongsberg/simrad instrument files (.raw or .wcd)
+        # ms excel, ms access, ms word
+        # application/vnd.lotus-organizer
+        else:
+            name_of_org = links.get('data-organization')
+            link_i_want = links.get('href')
+            data_format = 'Not part of long list of basic extensions'
+            print('Not part of long list of basic extensions')
+            print(name_of_org)
+            print(link_i_want)
+            #    return name_of_org & & link_i_want
+
+        record = {
+            'Name of Org': name_of_org,
+            'Data Format': data_format,
+            'url': link_i_want
+
+        }
+
+        extracted_records.append(record)
+    print(extracted_records)
+
+with open(os.path.join(path, file),'w') as fp:
+    pass
+
+with open(file,'w') as outfile:
+    json.dump(extracted_records, outfile)
