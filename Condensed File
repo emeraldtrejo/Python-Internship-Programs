@@ -1,0 +1,45 @@
+# !/usr/bin/env python3
+
+from bs4 import BeautifulSoup
+import requests
+import os
+import json
+from datetime import datetime
+
+time_created = datetime.now().strftime("%d-%m-%Y_%I-%M-%S_%p")
+
+path = '/tmp/pyprogram/test2'
+file = time_created + 'myfile.txt'
+
+extracted_records = []
+
+for page in range(1, 2):
+    # Step 1: Sending a HTTP request to a URL
+    url = "https://catalog.data.gov/dataset?organization_type=Federal+Government&page="
+    # Make a GET request to fetch the raw HTML content
+    html_content = requests.get(url + str(page)).text
+
+    # Step 2: Parse the html content
+    soup = BeautifulSoup(html_content, 'html5lib')
+    data_containers = soup.find_all('a', class_='label')
+    for links in data_containers:
+        name_of_org = links.get('data-organization')
+        link_i_want = links.get('href')
+        data_format = links.get('data-format')
+        print(data_format)
+        print(name_of_org)
+        print(link_i_want)
+
+        record = {
+            'Name of Org': name_of_org,
+            'Data Format': data_format,
+            'url': link_i_want
+        }
+
+        extracted_records.append(record)
+
+with open(os.path.join(path, file), 'w') as fp:
+    pass
+
+with open(file, 'w') as outfile:
+    json.dump(extracted_records, outfile)
