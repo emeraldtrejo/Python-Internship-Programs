@@ -1,0 +1,81 @@
+# !/usr/bin/env python3
+
+from bs4 import BeautifulSoup
+import requests
+import os
+import json
+from urllib.parse import urljoin
+
+path = '/tmp/pyprogram/test5'
+file = 'myfile1.txt'
+
+data = []
+
+def download_docs(link):
+    # make folder
+    #name1 = name.replace(" ", "")
+    #os.makedirs(name1)
+    url_data = 'https://www.meps.ahrq.gov/mepsweb/data_stats/' + link
+    #location = os.path.join('/tmp/pyprogram/test6/' + name1)
+    location = '/tmp/pyprogram/test5/test'
+    # uniq = 1
+    # while os.path.exists(location):
+    #     location = os.path.join('/tmp/pyprogram/test6/' + name1 + str(uniq))
+    #     uniq += 1
+
+
+    response = requests.get(url_data)
+    soup = BeautifulSoup(response.text, "html.parser")
+    for link in soup.select("a[href$='.pdf']"):
+        # Name the pdf files using the last portion of each link which are unique in this case
+        filename = os.path.join(location, link['href'].split('/')[-1])
+        with open(filename, 'wb') as f:
+            f.write(requests.get(urljoin(url_data, link['href'])).content)
+    for link in soup.select("a[href$='.txt']"):
+        # Name the pdf files using the last portion of each link which are unique in this case
+        filename = os.path.join(location, link['href'].split('/')[-1])
+        with open(filename, 'wb') as f:
+            f.write(requests.get(urljoin(url_data, link['href'])).content)
+    for link in soup.select("a[href$='.zip']"):
+        # Name the pdf files using the last portion of each link which are unique in this case
+        filename = os.path.join(location, link['href'].split('/')[-1])
+        with open(filename, 'wb') as f:
+            f.write(requests.get(urljoin(url_data, link['href'])).content)
+
+
+for page in range(1, 400, 99):
+    # Step 1: Sending a HTTP request to a URL
+    # start at 1
+    url = "https://meps.ahrq.gov/mepsweb/data_stats/download_data_files_results.jsp?cboDataYear=All&buttonYearandDataType=1,Search%20all%20data%20files&cboPufNumber=&startAt="
+    # Make a GET request to fetch the raw HTML content
+    res = requests.get(url + str(page)).text
+    soup = BeautifulSoup(res, 'html5lib')
+    table = soup.find('table', {"summary": "PUF Search Results"})
+    table_body = table.find('tbody')
+    # Step 2: Parse the html content
+    rows = table_body.find_all('tr')
+    for row in rows:
+        anchors = row.find_all('a')
+        for a in anchors:
+            link = a.get('href')
+        cols = row.find_all('td')
+        for c in cols:
+            name = c.getText()
+        # print(link)
+        # print(name)
+
+        record = {
+            'Name of File': name,
+            'Link for Data': 'https://www.meps.ahrq.gov/mepsweb/data_stats/' + link
+        }
+
+        download_docs(link)
+
+        data.append(record)
+    print(data)
+
+with open(os.path.join(path, file), 'w') as fp:
+    pass
+
+with open(file, 'w') as outfile:
+    json.dump(data, outfile)
