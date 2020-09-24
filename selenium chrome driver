@@ -1,0 +1,28 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+
+
+chromeOptions = webdriver.ChromeOptions()
+chromeOptions.add_argument("--headless")
+chromeOptions.add_argument("--remote-debugging-port=9222")
+chromeOptions.add_argument('--no-sandbox')
+
+browser = webdriver.Chrome('/usr/bin/chromedriver',chrome_options=chromeOptions)
+
+link = "https://www.cnn.com/"
+keyword = "trump"
+browser.get(link)
+list = []
+
+browser.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.SHIFT + 'i')
+elems = browser.find_elements_by_tag_name('a')
+for elem in elems:
+    href = elem.get_attribute('href')
+    if href is not None:
+        if (keyword.lower() in href.lower()):
+            print(href)
+            visited_content.append(href)
+print(list)
