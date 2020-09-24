@@ -26,3 +26,7 @@ for elem in elems:
             print(href)
             visited_content.append(href)
 print(list)
+
+
+#reference article
+#https://www.usessionbuddy.com/post/How-To-Install-Selenium-Chrome-On-Centos-7/
