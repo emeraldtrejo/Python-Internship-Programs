@@ -1,0 +1,21 @@
+#!/path/to/venv/bin/python
+
+from pyvirtualdisplay import Display
+from selenium import webdriver
+
+keyword = "covid"
+hits = []
+
+display = Display(visible=0, size=(800, 600))
+display.start()
+driver = webdriver.Chrome()
+driver.get('https://www.cnn.com/')
+elems = driver.find_elements_by_tag_name('a')
+for elem in elems:
+    href = elem.get_attribute('href')
+    if href is not None:
+        if (keyword.lower() in href.lower()):
+            print(href)
+            hits.append(href)
+print("visited content")
+print(hits)
